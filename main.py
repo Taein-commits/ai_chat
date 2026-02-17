@@ -273,9 +273,9 @@ if prompt := st.chat_input("Type your message..."):
         # -------------------------
         if bot.last_usage:
 
-            input_tokens = bot.last_usage.prompt_tokens
-            output_tokens = bot.last_usage.completion_tokens
-            total_tokens = bot.last_usage.total_tokens
+            input_tokens = bot.last_usage["prompt_tokens"]
+            output_tokens = bot.last_usage["completion_tokens"]
+            total_tokens = bot.last_usage["total_tokens"]
 
             pricing = MODEL_PRICING[selected_model]
 
