@@ -266,7 +266,7 @@ if prompt := st.chat_input("Type your message..."):
             full_text = ""
 
             if agent_mode: gen = bot.agent_chat(prompt, temperature=temperature)
-            else: bot.chat(prompt, temperature=temperature)
+            else: gen = bot.chat(prompt, temperature=temperature)
             for partial in gen:
                 full_text = partial
                 placeholder.markdown(full_text)
