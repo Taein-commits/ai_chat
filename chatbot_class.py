@@ -10,6 +10,7 @@ class ChatbotAI:
         self.reply = ""
         self.total_tokens = 0
         self.total_cost = 0.0
+        self.last_usage = None
 
     def update_system_prompt(self, new_prompt):
         self.messages = [
@@ -32,20 +33,27 @@ class ChatbotAI:
             model=self.model,
             messages=self.messages,
             temperature=temperature,
-            stream=True
+            stream=False
         )
 
-        full_reply = ""
+        full_reply = response.choices[0].message.content
 
-        for chunk in response:
-            if chunk.choices[0].delta.content:
-                full_reply += chunk.choices[0].delta.content
-                yield full_reply
+        # Save usage
+        if hasattr(response, "usage") and response.usage:
+            self.last_usage = {
+                "prompt_tokens": response.usage.prompt_tokens,
+                "completion_tokens": response.usage.completion_tokens,
+                "total_tokens": response.usage.total_tokens
+            }
+        else:
+            self.last_usage = None
 
         self.reply = full_reply
         self.messages.append({"role": "assistant", "content": full_reply})
 
         self.trim_memory()
+
+        return full_reply
 
     # --------------------------------------------------
     # AGENT MODE (Multi-step reasoning)
