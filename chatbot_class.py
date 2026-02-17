@@ -1,4 +1,6 @@
 from openai import OpenAI
+from tool_registry import TOOLS, TOOL_FUNCTIONS
+import json
 
 class ChatbotAI:
     def __init__(self, model, system_prompt, key=None):
@@ -7,8 +9,7 @@ class ChatbotAI:
         self.messages = [
             {"role": "system", "content": system_prompt}
         ]
-        self.reply = ""
-        self.last_usage = None  # 💰 store usage
+        self.last_usage = None
 
     def update_system_prompt(self, new_prompt):
         self.messages = [
@@ -21,26 +22,52 @@ class ChatbotAI:
         response = self.client.chat.completions.create(
             model=self.model,
             messages=self.messages,
-            temperature=temperature,
-            stream=True
+            tools=TOOLS,
+            tool_choice="auto",
+            temperature=temperature
         )
 
-        full_reply = ""
+        message = response.choices[0].message
 
-        for chunk in response:
-            # Collect streamed text
-            if chunk.choices[0].delta.content:
-                full_reply += chunk.choices[0].delta.content
-                yield full_reply
+        # 🔥 If tool call detected
+        if message.tool_calls:
+            tool_call = message.tool_calls[0]
+            tool_name = tool_call.function.name
+            arguments = json.loads(tool_call.function.arguments)
 
-            # Capture usage when available
-            if hasattr(chunk, "usage") and chunk.usage:
-                self.last_usage = chunk.usage
+            # Execute tool
+            result = TOOL_FUNCTIONS[tool_name](**arguments)
 
-        self.reply = full_reply
-        self.messages.append({"role": "assistant", "content": self.reply})
+            # Add tool result to conversation
+            self.messages.append(message)
+            self.messages.append({
+                "role": "tool",
+                "tool_call_id": tool_call.id,
+                "content": json.dumps(result)
+            })
 
-        # Memory trim
-        MAX_MESSAGES = 20
-        if len(self.messages) > MAX_MESSAGES:
-            self.messages = [self.messages[0]] + self.messages[-MAX_MESSAGES:]
+            # Ask model to generate final answer using tool result
+            final_response = self.client.chat.completions.create(
+                model=self.model,
+                messages=self.messages,
+                temperature=temperature
+            )
+
+            final_message = final_response.choices[0].message.content
+            self.messages.append({
+                "role": "assistant",
+                "content": final_message
+            })
+
+            self.last_usage = final_response.usage
+            return final_message
+
+        else:
+            # Normal response
+            reply = message.content
+            self.messages.append({
+                "role": "assistant",
+                "content": reply
+            })
+            self.last_usage = response.usage
+            return reply
