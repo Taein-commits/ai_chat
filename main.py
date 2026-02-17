@@ -93,6 +93,14 @@ temperature = st.sidebar.slider(
     0.0, 1.5, 0.7, 0.1
 )
 
+st.sidebar.markdown("---")
+st.sidebar.subheader("📂 Upload Document")
+
+uploaded_file = st.sidebar.file_uploader(
+    "Upload PDF or CSV",
+    type=["pdf", "csv", "txt"]
+)
+
 # -------------------------
 # Initialize Session Cost
 # -------------------------
