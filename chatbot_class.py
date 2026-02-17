@@ -8,11 +8,12 @@ class ChatbotAI:
             {"role": "system", "content": system_prompt}
         ]
         self.reply = ""
-        
+        self.last_usage = None  # 💰 store usage
+
     def update_system_prompt(self, new_prompt):
         self.messages = [
             {"role": "system", "content": new_prompt}
-        ]    
+        ]
 
     def add_user_input(self, text, temperature=0.5):
         self.messages.append({"role": "user", "content": text})
@@ -27,17 +28,19 @@ class ChatbotAI:
         full_reply = ""
 
         for chunk in response:
+            # Collect streamed text
             if chunk.choices[0].delta.content:
                 full_reply += chunk.choices[0].delta.content
-                yield full_reply   # 🔥 IMPORTANT
+                yield full_reply
+
+            # Capture usage when available
+            if hasattr(chunk, "usage") and chunk.usage:
+                self.last_usage = chunk.usage
 
         self.reply = full_reply
         self.messages.append({"role": "assistant", "content": self.reply})
-        
-        # Memory trim (keep last 20 messages)
+
+        # Memory trim
         MAX_MESSAGES = 20
         if len(self.messages) > MAX_MESSAGES:
             self.messages = [self.messages[0]] + self.messages[-MAX_MESSAGES:]
-
-    def get_reply(self):
-        return self.reply
