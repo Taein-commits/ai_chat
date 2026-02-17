@@ -1,7 +1,8 @@
 import streamlit as st
-import base64, re
+import base64, re, pandas as pd
 from io import BytesIO
 from PIL import Image
+from PyPDF2 import PdfReader
 from chatbot_class import ChatbotAI
 from style import style
 
@@ -101,6 +102,27 @@ uploaded_file = st.sidebar.file_uploader(
     type=["pdf", "csv", "txt"]
 )
 
+document_text = None
+
+if uploaded_file is not None:
+    file_type = uploaded_file.name.split(".")[-1]
+
+    if file_type == "pdf":
+        reader = PdfReader(uploaded_file)
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text() + "\n"
+        document_text = text
+
+    elif file_type == "csv":
+        df = pd.read_csv(uploaded_file)
+        document_text = df.to_string()
+
+    elif file_type == "txt":
+        document_text = uploaded_file.read().decode("utf-8")
+
+    st.sidebar.success("Document loaded successfully!")
+    
 # -------------------------
 # Initialize Session Cost
 # -------------------------
