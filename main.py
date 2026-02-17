@@ -198,6 +198,12 @@ for msg in bot.messages:
 # Chat Input
 # -------------------------
 if prompt := st.chat_input("Type your message..."):
+    if "df" in st.session_state:
+        user_lower = prompt.lower()
+
+        if "plot" in user_lower or "chart" in user_lower or "graph" in user_lower:
+            generate_chart(prompt, st.session_state.df)
+            st.stop()
 
     with st.chat_message("user"):
         st.markdown(prompt)
