@@ -1,5 +1,9 @@
-streamlit
-openai
-pillow
-PyPdf2
-pandas
+streamlit>=1.32.0
+openai>=1.30.0
+mysql-connector-python>=8.3.0
+numpy>=1.26.0
+pandas>=2.2.0
+matplotlib>=3.8.0
+PyPDF2>=3.0.1
+pillow>=10.2.0
+python-dotenv>=1.0.1
