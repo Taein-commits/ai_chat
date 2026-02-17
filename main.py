@@ -260,18 +260,12 @@ if prompt := st.chat_input("Type your message..."):
         })
 
     else:
-
         with st.chat_message("assistant"):
-            placeholder = st.empty()
-            full_text = ""
+            if agent_mode:
+                full_text = bot.agent_chat(prompt, temperature=temperature)
+            else:
+                full_text = bot.chat(prompt, temperature=temperature)
 
-            if agent_mode: gen = bot.agent_chat(prompt, temperature=temperature)
-            else: gen = bot.chat(prompt, temperature=temperature)
-            for partial in gen:
-                full_text = partial
-                placeholder.markdown(full_text)
-
-            placeholder.empty()
             render_response(full_text)
 
         # -------------------------
