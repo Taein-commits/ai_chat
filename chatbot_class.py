@@ -14,12 +14,13 @@ class ChatbotAI:
             {"role": "system", "content": new_prompt}
         ]    
 
-    def add_user_input(self, text):
+    def add_user_input(self, text, temperature=0.5):
         self.messages.append({"role": "user", "content": text})
 
         response = self.client.chat.completions.create(
             model=self.model,
             messages=self.messages,
+            temperature=temperature
             stream=True
         )
 
