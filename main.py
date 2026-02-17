@@ -116,6 +116,7 @@ if uploaded_file is not None:
 
     elif file_type == "csv":
         df = pd.read_csv(uploaded_file)
+        st.session_states.df = df
         document_text = df.to_string()
 
     elif file_type == "txt":
