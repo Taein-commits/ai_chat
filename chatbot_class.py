@@ -15,6 +15,12 @@ class ChatbotAI:
         self.messages = [
             {"role": "system", "content": new_prompt}
         ]
+        
+    def load_document(self, text):
+        self.messages.append({
+            "role": "system",
+            "content": f"You have access to this document:\n\n{text[:8000]}"
+        })    
 
     # --------------------------------------------------
     # NORMAL CHAT MODE
