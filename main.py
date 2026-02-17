@@ -40,6 +40,12 @@ MODES = {
     "English Trainer": "You help improve English speaking. Correct grammar gently and suggest better sentences.",
     "Draw 🎨": "You generate creative image prompts.",
 }
+MODEL_OPTIONS = {
+    "⚡ Fast (gpt-4o-mini)": "gpt-4o-mini",
+    "🧠 Smart (gpt-4o)": "gpt-4o",
+    "🔬 Reasoning (gpt-4.1)": "gpt-4.1",
+    "💰 Budget (gpt-4.1-mini)": "gpt-4.1-mini"
+}
 
 # -------------------------
 # Streamlit GUI
@@ -61,7 +67,8 @@ margin-bottom: 10px;
 """, unsafe_allow_html=True)
 
 st.sidebar.title("⚙ Settings")
-selected_mode = st.sidebar.selectbox("Mode", list(MODES.keys()))  
+st.sidebar.markdown("### Mode")
+selected_mode = st.sidebar.selectbox("Choose Mode", list(MODES.keys()))  
 st.sidebar.markdown("### 🎛 Creativity")
 temperature = st.sidebar.slider(
     "Temperature",
@@ -69,7 +76,21 @@ temperature = st.sidebar.slider(
     max_value=1.5,
     value=0.7,
     step=0.1
-)  
+) 
+st.sidebar.markdown("### Model")
+selected_model_label = st.sidebar.selectbox("Choose Model", MODEL_OPTIONS.keys())
+selected_model = MODEL_OPTIONS[selected_model_label]
+
+if "current_model" not in st.session_state:
+    st.session_state.current_model = selected_model
+
+if selected_model != st.session_state.current_model:
+    st.session_state.bot = ChatbotAI(
+        model=selected_model,
+        system_prompt=MODES[selected_mode]
+    )
+    st.session_state.current_model = selected_model
+    st.rerun()
 
 # Create chatbot only once (important!)
 if "bot" not in st.session_state:
