@@ -20,7 +20,7 @@ class ChatbotAI:
         response = self.client.chat.completions.create(
             model=self.model,
             messages=self.messages,
-            temperature=temperature
+            temperature=temperature,
             stream=True
         )
 
