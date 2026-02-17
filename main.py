@@ -5,8 +5,40 @@ from PIL import Image
 from chatbot_class import ChatbotAI
 from style import style
 
-st.set_page_config(page_title="My AI Chatbot By Taein Kim", page_icon="🤖")
+# -------------------------
+# Page Config (MUST BE FIRST)
+# -------------------------
+st.set_page_config(
+    page_title="My AI Assistant By Taein Kim",
+    page_icon="🤖"
+)
 
+st.markdown(style, unsafe_allow_html=True)
+
+# -------------------------
+# Pricing Table (per 1K tokens)
+# -------------------------
+MODEL_PRICING = {
+    "gpt-4o-mini": {"input": 0.00015, "output": 0.0006},
+    "gpt-4o": {"input": 0.005, "output": 0.015},
+    "gpt-4.1": {"input": 0.01, "output": 0.03},
+    "gpt-4.1-mini": {"input": 0.0003, "output": 0.0012},
+}
+
+# -------------------------
+# Modes
+# -------------------------
+MODES = {
+    "General": "You are a helpful AI assistant.",
+    "Coder": "You are an expert Python, Arduino developer.",
+    "Medical": "You are a clinical medical tutor.",
+    "English Trainer": "You help improve English speaking.",
+    "Draw 🎨": "You generate creative image prompts.",
+}
+
+# -------------------------
+# Render Code Blocks
+# -------------------------
 def render_response(text):
     code_blocks = re.findall(r"```(.*?)```", text, re.DOTALL)
 
@@ -19,9 +51,8 @@ def render_response(text):
 
             if i < len(code_blocks):
                 code_content = code_blocks[i]
-
-                # Try to detect language
                 first_line = code_content.strip().split("\n")[0]
+
                 if first_line.isalpha():
                     language = first_line
                     code_body = "\n".join(code_content.split("\n")[1:])
@@ -33,13 +64,13 @@ def render_response(text):
     else:
         st.markdown(text)
 
-MODES = {
-    "General": "You are a helpful AI assistant.",
-    "Coder": "You are an expert Python, Arduino, and software engineer. Give clean code with explanation.",
-    "Medical": "You are a clinical medical tutor helping prepare for USMLE exams. Explain clearly and structured.",
-    "English Trainer": "You help improve English speaking. Correct grammar gently and suggest better sentences.",
-    "Draw 🎨": "You generate creative image prompts.",
-}
+# -------------------------
+# Sidebar Controls
+# -------------------------
+st.sidebar.title("⚙ Settings")
+
+selected_mode = st.sidebar.selectbox("Mode", list(MODES.keys()))
+
 MODEL_OPTIONS = {
     "⚡ Fast (gpt-4o-mini)": "gpt-4o-mini",
     "🧠 Smart (gpt-4o)": "gpt-4o",
@@ -47,43 +78,40 @@ MODEL_OPTIONS = {
     "💰 Budget (gpt-4.1-mini)": "gpt-4.1-mini"
 }
 
-# -------------------------
-# Streamlit GUI
-# -------------------------
-st.markdown(style, unsafe_allow_html=True)
+selected_model_label = st.sidebar.selectbox(
+    "Model",
+    list(MODEL_OPTIONS.keys())
+)
 
-st.markdown("""
-<h1 style='
-text-align:center;
-font-size:48px;
-font-weight:800;
-background: linear-gradient(90deg, #38bdf8, #6366f1);
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
-margin-bottom: 10px;
-'>
-🤖 My AI Assistant By Taein Kim
-</h1>
-""", unsafe_allow_html=True)
-
-st.sidebar.title("⚙ Settings")
-st.sidebar.markdown("### Mode")
-selected_mode = st.sidebar.selectbox("Choose Mode", list(MODES.keys()))  
-st.sidebar.markdown("### 🎛 Creativity")
-temperature = st.sidebar.slider(
-    "Temperature",
-    min_value=0.0,
-    max_value=1.5,
-    value=0.7,
-    step=0.1
-) 
-st.sidebar.markdown("### Model")
-selected_model_label = st.sidebar.selectbox("Choose Model", MODEL_OPTIONS.keys())
 selected_model = MODEL_OPTIONS[selected_model_label]
 
-if "current_model" not in st.session_state:
+temperature = st.sidebar.slider(
+    "Creativity (Temperature)",
+    0.0, 1.5, 0.7, 0.1
+)
+
+# -------------------------
+# Initialize Session Cost
+# -------------------------
+if "total_cost" not in st.session_state:
+    st.session_state.total_cost = 0
+
+# -------------------------
+# Initialize Bot
+# -------------------------
+if "bot" not in st.session_state:
+    st.session_state.bot = ChatbotAI(
+        model=selected_model,
+        system_prompt=MODES[selected_mode]
+    )
+    st.session_state.current_mode = selected_mode
     st.session_state.current_model = selected_model
 
+bot = st.session_state.bot
+
+# -------------------------
+# Detect Model Change
+# -------------------------
 if selected_model != st.session_state.current_model:
     st.session_state.bot = ChatbotAI(
         model=selected_model,
@@ -92,14 +120,36 @@ if selected_model != st.session_state.current_model:
     st.session_state.current_model = selected_model
     st.rerun()
 
-# Create chatbot only once (important!)
-if "bot" not in st.session_state:
-    st.session_state.bot = ChatbotAI(model="gpt-4o-mini", system_prompt=MODES[selected_mode])
+# -------------------------
+# Detect Mode Change
+# -------------------------
+if selected_mode != st.session_state.current_mode:
+    st.session_state.bot = ChatbotAI(
+        model=selected_model,
+        system_prompt=MODES[selected_mode]
+    )
     st.session_state.current_mode = selected_mode
+    st.rerun()
 
-bot = st.session_state.bot
+# -------------------------
+# Title
+# -------------------------
+st.markdown("""
+<h1 style='
+text-align:center;
+font-size:48px;
+font-weight:800;
+background: linear-gradient(90deg, #38bdf8, #6366f1);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+'>
+🤖 My AI Assistant By Taein Kim
+</h1>
+""", unsafe_allow_html=True)
 
-# Display previous messages
+# -------------------------
+# Display History
+# -------------------------
 for msg in bot.messages:
     if msg["role"] != "system":
         with st.chat_message(msg["role"]):
@@ -108,31 +158,45 @@ for msg in bot.messages:
             else:
                 st.markdown(msg["content"])
 
-if "current_mode" not in st.session_state:
-    st.session_state.current_mode = selected_mode
-
-if selected_mode != st.session_state.current_mode:
-    st.session_state.bot.update_system_prompt(MODES[selected_mode])
-    st.session_state.current_mode = selected_mode
-
-# Chat input
+# -------------------------
+# Chat Input
+# -------------------------
 if prompt := st.chat_input("Type your message..."):
-    
-    # Show user message
+
     with st.chat_message("user"):
         st.markdown(prompt)
 
     if selected_mode == "Draw 🎨":
+
         with st.chat_message("assistant"):
             with st.spinner("Generating image..."):
-                st.image(Image.open(BytesIO(base64.b64decode(bot.client.images.generate(model="gpt-image-1",prompt=prompt,size="1024x1024").data[0].b64_json))))
-                
-        # Save to memory
+
+                result = bot.client.images.generate(
+                    model="gpt-image-1",
+                    prompt=prompt,
+                    size="1024x1024"
+                )
+
+                image_data = result.data[0].b64_json
+                image_bytes = base64.b64decode(image_data)
+                image = Image.open(BytesIO(image_bytes))
+
+                st.image(image)
+
+                st.download_button(
+                    "⬇ Download Image",
+                    image_bytes,
+                    file_name="ai_image.png",
+                    mime="image/png"
+                )
+
         bot.messages.append({
             "role": "assistant",
             "content": f"[Generated image for prompt: {prompt}]"
-        })        
-    else:             
+        })
+
+    else:
+
         with st.chat_message("assistant"):
             placeholder = st.empty()
             full_text = ""
@@ -141,7 +205,37 @@ if prompt := st.chat_input("Type your message..."):
                 full_text = partial
                 placeholder.markdown(full_text)
 
-            # After streaming finishes, render properly
             placeholder.empty()
             render_response(full_text)
 
+        # -------------------------
+        # COST CALCULATION
+        # -------------------------
+        if bot.last_usage:
+
+            input_tokens = bot.last_usage.prompt_tokens
+            output_tokens = bot.last_usage.completion_tokens
+            total_tokens = bot.last_usage.total_tokens
+
+            pricing = MODEL_PRICING[selected_model]
+
+            cost = (
+                (input_tokens / 1000) * pricing["input"] +
+                (output_tokens / 1000) * pricing["output"]
+            )
+
+            st.session_state.total_cost += cost
+
+            st.caption(
+                f"Tokens: {total_tokens} | "
+                f"Cost: ${cost:.6f}"
+            )
+
+# -------------------------
+# Sidebar Cost Display
+# -------------------------
+st.sidebar.markdown("### 💰 Session Cost")
+st.sidebar.metric(
+    "Total Cost",
+    f"${st.session_state.total_cost:.4f}"
+)
