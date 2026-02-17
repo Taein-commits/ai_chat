@@ -67,6 +67,9 @@ def render_response(text):
 # -------------------------
 # Sidebar Controls
 # -------------------------
+
+agent_mode = st.sidebar.checkbox("Agent Mode", value=False)
+
 st.sidebar.title("⚙ Settings")
 
 selected_mode = st.sidebar.selectbox("Mode", list(MODES.keys()))
@@ -201,7 +204,9 @@ if prompt := st.chat_input("Type your message..."):
             placeholder = st.empty()
             full_text = ""
 
-            for partial in bot.add_user_input(prompt, temperature=temperature):
+            if agent_mode: gen = bot.agent_chat(prompt, temperature=temperature)
+            else: bot.chat  (prompt, temperature=temperature)
+            for partial in gen:
                 full_text = partial
                 placeholder.markdown(full_text)
 
