@@ -234,7 +234,7 @@ if prompt := st.chat_input("Type your message..."):
 # -------------------------
 # Sidebar Cost Display
 # -------------------------
-st.sidebar.markdown("### 💰 Session Cost")
+st.sidebar.title("💰 Session Cost")
 st.sidebar.metric(
     "Total Cost",
     f"${st.session_state.total_cost:.4f}"
