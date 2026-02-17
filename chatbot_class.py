@@ -1,7 +1,9 @@
 from openai import OpenAI
 from mysql_class import MySQLMemory
+from dotenv import load_dotenv
 import os
 
+load_dotenv()
 
 class ChatbotAI:
 
