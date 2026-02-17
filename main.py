@@ -61,7 +61,15 @@ margin-bottom: 10px;
 """, unsafe_allow_html=True)
 
 st.sidebar.title("⚙ Settings")
-selected_mode = st.sidebar.selectbox("Mode", list(MODES.keys()))    
+selected_mode = st.sidebar.selectbox("Mode", list(MODES.keys()))  
+st.sidebar.markdown("### 🎛 Creativity")
+temperature = st.sidebar.slider(
+    "Temperature",
+    min_value=0.0,
+    max_value=1.5,
+    value=0.7,
+    step=0.1
+)  
 
 # Create chatbot only once (important!)
 if "bot" not in st.session_state:
@@ -108,7 +116,7 @@ if prompt := st.chat_input("Type your message..."):
             placeholder = st.empty()
             full_text = ""
 
-            for partial in bot.add_user_input(prompt):
+            for partial in bot.add_user_input(prompt, temperature=temperature):
                 full_text = partial
                 placeholder.markdown(full_text)
 
