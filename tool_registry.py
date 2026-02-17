@@ -1,6 +1,6 @@
 # tool_registry.py
 
-from tools import calculator, bmi
+from tools import calculator, bmi, python_executor
 
 TOOLS = [
     {
@@ -34,10 +34,29 @@ TOOLS = [
                 "required": ["height_cm", "weight_kg"]
             }
         }
+    },
+    
+    {
+        "type": "function",
+        "function": {
+            "name": "python_executor",
+            "description": "Execute safe Python code and return output.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "description": "Python code to execute"
+                    }
+                },
+                "required": ["code"]
+            }
+        }
     }
 ]
 
 TOOL_FUNCTIONS = {
     "calculator": calculator,
-    "bmi": bmi
+    "bmi": bmi,
+    "python_executor": python_executor
 }
