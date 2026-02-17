@@ -141,6 +141,8 @@ if "bot" not in st.session_state:
     st.session_state.current_model = selected_model
 
 bot = st.session_state.bot
+if document_text:
+    bot.load_document(document_text)
 
 # -------------------------
 # Detect Model Change
