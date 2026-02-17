@@ -1,6 +1,4 @@
 from openai import OpenAI
-from tool_registry import TOOLS, TOOL_FUNCTIONS
-import json
 
 class ChatbotAI:
     def __init__(self, model, system_prompt, key=None):
@@ -9,65 +7,98 @@ class ChatbotAI:
         self.messages = [
             {"role": "system", "content": system_prompt}
         ]
-        self.last_usage = None
+        self.reply = ""
+        self.total_tokens = 0
+        self.total_cost = 0.0
 
     def update_system_prompt(self, new_prompt):
         self.messages = [
             {"role": "system", "content": new_prompt}
         ]
 
-    def add_user_input(self, text, temperature=0.5):
+    # --------------------------------------------------
+    # NORMAL CHAT MODE
+    # --------------------------------------------------
+    def chat(self, text, temperature=0.5):
         self.messages.append({"role": "user", "content": text})
 
         response = self.client.chat.completions.create(
             model=self.model,
             messages=self.messages,
-            tools=TOOLS,
-            tool_choice="auto",
-            temperature=temperature
+            temperature=temperature,
+            stream=True
         )
 
-        message = response.choices[0].message
+        full_reply = ""
 
-        # 🔥 If tool call detected
-        if message.tool_calls:
+        for chunk in response:
+            if chunk.choices[0].delta.content:
+                full_reply += chunk.choices[0].delta.content
+                yield full_reply
+
+        self.reply = full_reply
+        self.messages.append({"role": "assistant", "content": full_reply})
+
+        self.trim_memory()
+
+    # --------------------------------------------------
+    # AGENT MODE (Multi-step reasoning)
+    # --------------------------------------------------
+    def agent_chat(self, text, temperature=0.5, max_steps=3):
+        self.messages.append({"role": "user", "content": text})
+
+        for step in range(max_steps):
+
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=self.messages,
+                temperature=temperature,
+            )
+
+            message = response.choices[0].message
+
+            # If no tool calls → final answer
+            if not message.tool_calls:
+                final_answer = message.content
+                self.messages.append(
+                    {"role": "assistant", "content": final_answer}
+                )
+                yield final_answer
+                break
+
+            # Tool call detected
             tool_call = message.tool_calls[0]
             tool_name = tool_call.function.name
-            arguments = json.loads(tool_call.function.arguments)
+            arguments = tool_call.function.arguments
 
-            # Execute tool
-            result = TOOL_FUNCTIONS[tool_name](**arguments)
+            tool_result = self.execute_tool(tool_name, arguments)
 
-            # Add tool result to conversation
             self.messages.append(message)
             self.messages.append({
                 "role": "tool",
                 "tool_call_id": tool_call.id,
-                "content": json.dumps(result)
+                "content": str(tool_result),
             })
 
-            # Ask model to generate final answer using tool result
-            final_response = self.client.chat.completions.create(
-                model=self.model,
-                messages=self.messages,
-                temperature=temperature
-            )
+        self.trim_memory()
 
-            final_message = final_response.choices[0].message.content
-            self.messages.append({
-                "role": "assistant",
-                "content": final_message
-            })
+    # --------------------------------------------------
+    # TOOL EXECUTION
+    # --------------------------------------------------
+    def execute_tool(self, name, arguments):
+        import json
+        args = json.loads(arguments)
 
-            self.last_usage = final_response.usage
-            return final_message
+        if name == "calculate_bmi":
+            height = args["height_cm"] / 100
+            weight = args["weight_kg"]
+            bmi = weight / (height ** 2)
+            return round(bmi, 2)
 
-        else:
-            # Normal response
-            reply = message.content
-            self.messages.append({
-                "role": "assistant",
-                "content": reply
-            })
-            self.last_usage = response.usage
-            return reply
+        return "Tool not implemented"
+
+    # --------------------------------------------------
+    def trim_memory(self):
+        MAX_MESSAGES = 20
+        if len(self.messages) > MAX_MESSAGES:
+            self.messages = [self.messages[0]] + self.messages[-MAX_MESSAGES:]
