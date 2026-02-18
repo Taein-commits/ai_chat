@@ -6,7 +6,7 @@ from config import MODEL_PRICING, MODES, MODEL_OPTIONS
 from ui.layout import setup_page, render_title
 from ui.render import render_response
 from features.charts import generate_chart
-from features.document_loader import load_document
+from features.documents import load_document
 
 # -------------------
 # Setup
