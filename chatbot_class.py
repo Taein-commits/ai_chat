@@ -31,6 +31,13 @@ class ChatbotAI:
         self.last_usage: Optional[Dict[str, int]] = None
         self.total_tokens: int = 0
         self.total_cost: float = 0.0
+        
+        self.session_limit: float = 2.0        # $2 per session
+        self.daily_limit: float = 5.0          # $5 per day
+        self.warning_ratio: float = 0.8        # 80% warning
+
+        self.daily_cost: float = 0.0
+        self.last_reset_date = date.today()
 
         self.memory: MySQLMemory = MySQLMemory(
             host=os.getenv("MYSQL_HOST", "localhost"),
@@ -38,6 +45,23 @@ class ChatbotAI:
             password=os.getenv("MYSQL_PASSWORD") or "",
             database=os.getenv("MYSQL_DATABASE", "aimemory")
         )
+
+    def check_cost_limit(self) -> None:
+        from datetime import date
+
+        # Reset daily cost if new day
+        today = date.today()
+        if today != self.last_reset_date:
+            self.daily_cost = 0.0
+            self.last_reset_date = today
+
+        # Hard session limit
+        if self.total_cost >= self.session_limit:
+            raise RuntimeError("Session cost limit reached.")
+
+        # Hard daily limit
+        if self.daily_cost >= self.daily_limit:
+            raise RuntimeError("Daily cost limit reached.")
 
     # --------------------------------------------------
     # UPDATE SYSTEM PROMPT
@@ -68,6 +92,15 @@ class ChatbotAI:
                 and "Relevant past memory:" in str(m.get("content"))
             )
         ]
+
+    def cost_warning(self) -> str | None:
+        if self.total_cost >= self.session_limit * self.warning_ratio:
+            return "⚠️ Session cost nearing limit."
+
+        if self.daily_cost >= self.daily_limit * self.warning_ratio:
+            return "⚠️ Daily cost nearing limit."
+
+        return None
 
     # --------------------------------------------------
     # STREAMING CHAT (WITH MEMORY + COST)
