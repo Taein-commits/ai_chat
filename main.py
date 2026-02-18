@@ -7,7 +7,7 @@ from chatbot_class import ChatbotAI
 from style import style
 import matplotlib.pyplot as plt
 
-def generate_chart(prompt, df):
+def generate_chart(prompt: str, df: pd.DataFrame) -> None:
     st.chat_message("assistant")
     st.write("📊 Generating chart...")
 
@@ -62,7 +62,7 @@ MODES = {
 # -------------------------
 # Render Code Blocks
 # -------------------------
-def render_response(text):
+def render_response(text: str) -> None:
     code_blocks = re.findall(r"```(.*?)```", text, re.DOTALL)
 
     if code_blocks:
