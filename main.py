@@ -264,12 +264,20 @@ if prompt := st.chat_input("Type your message..."):
             placeholder = st.empty()
             full_text = ""
 
-            for partial in bot.chat(prompt, temperature) if not agent_mode else bot.agent_chat(prompt, temperature=temperature):
+            try: gen = bot.chat(prompt, temperature) if not agent_mode else bot.agent_chat(prompt, temperature=temperature)
+            except RuntimeError as e:
+                st.error(str(e))
+                st.stop()
+            for partial in gen:
                 full_text = partial
                 placeholder.markdown(full_text + "▌")
 
             placeholder.empty()
             render_response(full_text)
+            
+            warning = bot.cost_warning()
+            if warning:
+                st.warning(warning)
 
         # -------------------------
         # COST CALCULATION
