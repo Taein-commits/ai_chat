@@ -88,7 +88,7 @@ class MySQLMemory:
 
         results.sort(key=lambda x: x[1], reverse=True)
 
-        return [r[0] for r in results[:top_k]]
+        return results[:top_k]
 
     def cosine_similarity(
         self,

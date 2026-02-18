@@ -2,7 +2,7 @@ from openai import OpenAI
 from openai.types.chat import ChatCompletionMessageParam
 from mysql_class import MySQLMemory
 from dotenv import load_dotenv
-from typing import Dict, Optional, Generator, List, Any, cast
+from typing import Dict, Optional, Generator, List, Any, cast, Tuple
 from datetime import date
 import os
 
@@ -114,7 +114,8 @@ class ChatbotAI:
         self.messages.append({"role": "user", "content": text})
 
         query_embedding: List[float] = self.create_embedding(text)
-        memories: List[str] = self.memory.retrieve_memory(user_id, query_embedding)
+        memory_with_scores: List[Tuple[int, float | int]] = self.memory.retrieve_memory(user_id, query_embedding)
+        memories: List[str] = [m[0] for m in memory_with_scores]
 
         self.clear_memory_block()
 
