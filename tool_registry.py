@@ -1,5 +1,6 @@
 # tool_registry.py
 
+from typing import Dict
 from tools import calculator, bmi, python_executor
 
 TOOLS = [
@@ -60,3 +61,36 @@ TOOL_FUNCTIONS = {
     "bmi": bmi,
     "python_executor": python_executor
 }
+
+class ToolRegistry:
+
+    def __init__(self):
+        self.tools: Dict[str, Dict] = {
+            "calculate_bmi": {
+                "enabled": True,
+                "usage": 0
+            },
+            "calculator": {
+                "enabled": True,
+                "usage": 0
+            },
+            "python_executor": {
+                "enabled": False,
+                "usage": 0
+            }
+        }
+
+    def enable(self, name: str):
+        if name in self.tools:
+            self.tools[name]["enabled"] = True
+
+    def disable(self, name: str):
+        if name in self.tools:
+            self.tools[name]["enabled"] = False
+
+    def increment_usage(self, name: str):
+        if name in self.tools:
+            self.tools[name]["usage"] += 1
+
+    def is_enabled(self, name: str) -> bool:
+        return self.tools.get(name, {}).get("enabled", False)

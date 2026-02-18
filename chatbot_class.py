@@ -3,6 +3,7 @@ from openai.types.chat import ChatCompletionMessageParam
 from mysql_class import MySQLMemory
 from dotenv import load_dotenv
 from typing import Dict, Optional, Generator, List, Any, cast, Tuple
+from tool_registry import ToolRegistry
 from datetime import date
 import os
 
@@ -32,6 +33,8 @@ class ChatbotAI:
         self.last_usage: Optional[Dict[str, int]] = None
         self.total_tokens: int = 0
         self.total_cost: float = 0.0
+        
+        self.tool_registry = ToolRegistry()
         
         self.session_limit: float = 2.0        # $2 per session
         self.daily_limit: float = 5.0          # $5 per day
@@ -234,15 +237,20 @@ class ChatbotAI:
     # --------------------------------------------------
     # TOOL EXECUTION
     # --------------------------------------------------
-    def execute_tool(self, name: str, arguments: str) -> float | str:
+    def execute_tool(self, name: str, arguments: str):
+
+        if not self.tool_registry.is_enabled(name):
+            return "Tool is disabled"
+
+        self.tool_registry.increment_usage(name)
+
         import json
-        args: Dict[str, Any] = json.loads(arguments)
+        args = json.loads(arguments)
 
         if name == "calculate_bmi":
-            height: float = args["height_cm"] / 100
-            weight: float = args["weight_kg"]
-            bmi: float = weight / (height ** 2)
-            return round(bmi, 2)
+            height = args["height_cm"] / 100
+            weight = args["weight_kg"]
+            return round(weight / (height**2), 2)
 
         return "Tool not implemented"
 
