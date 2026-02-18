@@ -46,6 +46,7 @@ class ChatbotAI:
             password=os.getenv("MYSQL_PASSWORD") or "",
             database=os.getenv("MYSQL_DATABASE", "aimemory")
         )
+        self.last_retrieval = []
 
     def check_cost_limit(self) -> None:
         # Reset daily cost if new day
@@ -116,6 +117,7 @@ class ChatbotAI:
         query_embedding: List[float] = self.create_embedding(text)
         memory_with_scores: List[Tuple[int, float | int]] = self.memory.retrieve_memory(user_id, query_embedding)
         memories: List[str] = [m[0] for m in memory_with_scores]
+        self.last_retrieval = memory_with_scores
 
         self.clear_memory_block()
 
