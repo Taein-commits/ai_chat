@@ -138,7 +138,7 @@ if uploaded_file is not None:
 
     elif file_type == "csv":
         df = pd.read_csv(uploaded_file)
-        st.session_states.df = df
+        st.session_state.df = df
         document_text = df.to_string()
 
     elif file_type == "txt":
@@ -264,11 +264,11 @@ if prompt := st.chat_input("Type your message..."):
             placeholder = st.empty()
             full_text = ""
 
-            for partial in bot.chat(prompt, temperature):
+            for partial in bot.chat(prompt, temperature) if not agent_mode else bot.agent_chat(prompt, temperature=temperature):
                 full_text = partial
                 placeholder.markdown(full_text + "▌")
 
-            placeholder.markdown(full_text)
+            placeholder.empty()
             render_response(full_text)
 
         # -------------------------
