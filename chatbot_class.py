@@ -3,6 +3,7 @@ from openai.types.chat import ChatCompletionMessageParam
 from mysql_class import MySQLMemory
 from dotenv import load_dotenv
 from typing import Dict, Optional, Generator, List, Any, cast
+from datetime import date
 import os
 
 load_dotenv()
@@ -47,8 +48,6 @@ class ChatbotAI:
         )
 
     def check_cost_limit(self) -> None:
-        from datetime import date
-
         # Reset daily cost if new day
         today = date.today()
         if today != self.last_reset_date:
