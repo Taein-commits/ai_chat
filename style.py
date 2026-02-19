@@ -197,5 +197,26 @@ header[data-testid="stHeader"] {
     pointer-events: none;
 }
 
+/* FORCE REMOVE LIGHT WRAPPERS */
+
+section.main > div {
+    background-color: transparent !important;
+}
+
+[data-testid="stAppViewContainer"] > .main {
+    background-color: #0b1220 !important;
+}
+
+[data-testid="stVerticalBlock"] {
+    background-color: transparent !important;
+}
+
+/* REMOVE WHITE TITLE CONTAINER */
+
+div:has(> h1) {
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
 </style>
 """
