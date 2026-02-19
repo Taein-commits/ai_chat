@@ -6,7 +6,7 @@ style = """
 /* ============================= */
 
 :root {
-    --bg-main: #1e1e1e;        /* Dark gray background */
+    --bg-main: linear-gradient(90deg,rgba(131, 58, 180, 1) 0%, rgba(52, 213, 224, 1) 50%, rgba(255, 200, 0, 1) 100%); /* Dark gray background */
     --bg-card: transparent;    /* Remove big card */
     --bg-bubble: #2a2a2a;      
     --bg-user: #3b82f6;
