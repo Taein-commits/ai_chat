@@ -6,53 +6,76 @@ style = """
 /* ============================= */
 
 html, body, [data-testid="stAppViewContainer"] {
-    background: linear-gradient(135deg, #0f172a, #1e293b, #0f172a);
-    background-attachment: fixed;
-    color: white;
-    font-family: 'Inter', sans-serif;
+    background-color: #0f172a;
+    color: #e2e8f0;
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* ============================= */
-/* CENTER MAIN CONTAINER */
+/* SIDEBAR */
+/* ============================= */
+
+[data-testid="stSidebar"] {
+    background-color: #111827;
+    border-right: 1px solid #1f2937;
+}
+
+[data-testid="stSidebar"] * {
+    color: #cbd5e1 !important;
+}
+
+/* ============================= */
+/* MAIN CONTAINER */
 /* ============================= */
 
 .block-container {
-    max-width: 850px;
-    margin: auto;
-    padding-top: 2rem;
-    padding-bottom: 3rem;
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 40px;
+    background-color: #111827;
+    border-radius: 16px;
+    border: 1px solid #1f2937;
 }
 
 /* ============================= */
-/* CHAT MESSAGES */
+/* HEADER */
+/* ============================= */
+
+h1 {
+    text-align: center;
+    font-weight: 600;
+    color: #e2e8f0;
+    margin-bottom: 40px;
+}
+
+/* ============================= */
+/* CHAT BUBBLES */
 /* ============================= */
 
 [data-testid="stChatMessage"] {
-    border-radius: 20px;
-    padding: 14px 18px;
-    margin-bottom: 12px;
-    backdrop-filter: blur(10px);
-    background: rgba(30, 41, 59, 0.6);
-    border: 1px solid rgba(255,255,255,0.08);
-    animation: fadeIn 0.3s ease-in-out;
-    transition: 0.2s ease-in-out;
-}
-
-/* Hover smooth effect */
-[data-testid="stChatMessage"]:hover {
-    transform: scale(1.01);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    background-color: #1e293b;
+    border: 1px solid #273549;
+    transition: 0.2s ease;
 }
 
 /* User bubble */
 [data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) {
-    background: rgba(59,130,246,0.2);
-    border: 1px solid rgba(59,130,246,0.5);
+    background-color: #1d4ed8;
+    border: none;
+    color: white;
 }
 
 /* Assistant bubble */
 [data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) {
-    background: rgba(100,116,139,0.2);
-    border: 1px solid rgba(100,116,139,0.4);
+    background-color: #1e293b;
+}
+
+/* Subtle hover */
+[data-testid="stChatMessage"]:hover {
+    border: 1px solid #334155;
 }
 
 /* ============================= */
@@ -60,45 +83,46 @@ html, body, [data-testid="stAppViewContainer"] {
 /* ============================= */
 
 textarea {
-    background: #0f172a !important;
-    color: white !important;
-    border-radius: 20px !important;
+    background-color: #0f172a !important;
+    color: #e2e8f0 !important;
+    border-radius: 10px !important;
     border: 1px solid #334155 !important;
     padding: 12px !important;
     font-size: 15px !important;
-    caret-color: #3b82f6;
 }
 
-/* Focus glow */
+/* Focus effect */
 textarea:focus {
     border: 1px solid #3b82f6 !important;
-    box-shadow: 0 0 15px rgba(59,130,246,0.5);
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
 }
 
-/* Floating chat input container */
+/* Chat input container */
 [data-testid="stChatInput"] {
-    position: sticky;
-    bottom: 20px;
-    background: rgba(15,23,42,0.9);
-    padding: 10px;
-    border-radius: 20px;
-    backdrop-filter: blur(10px);
+    margin-top: 20px;
 }
 
 /* ============================= */
-/* BUTTON STYLE */
+/* BUTTONS */
 /* ============================= */
 
 button[kind="primary"] {
-    background: linear-gradient(90deg, #3b82f6, #6366f1);
+    background-color: #2563eb;
+    border-radius: 8px;
     border: none;
-    border-radius: 20px;
-    transition: 0.2s ease-in-out;
 }
 
 button[kind="primary"]:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 10px rgba(59,130,246,0.6);
+    background-color: #1d4ed8;
+}
+
+/* ============================= */
+/* DROPDOWNS & SELECT */
+/* ============================= */
+
+div[data-baseweb="select"] {
+    background-color: #0f172a !important;
+    border-radius: 8px;
 }
 
 /* ============================= */
@@ -115,20 +139,11 @@ button[kind="primary"]:hover {
 
 ::-webkit-scrollbar-thumb {
     background: #334155;
-    border-radius: 10px;
+    border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
     background: #475569;
-}
-
-/* ============================= */
-/* FADE ANIMATION */
-/* ============================= */
-
-@keyframes fadeIn {
-    from {opacity: 0; transform: translateY(5px);}
-    to {opacity: 1; transform: translateY(0);}
 }
 
 </style>
