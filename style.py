@@ -2,7 +2,7 @@ style = """
 <style>
 
 /* ============================= */
-/* ROOT VARIABLES (clean control) */
+/* ROOT COLORS */
 /* ============================= */
 
 :root {
@@ -18,24 +18,26 @@ style = """
 }
 
 /* ============================= */
-/* GLOBAL BACKGROUND */
+/* GLOBAL */
 /* ============================= */
 
-html, body, [data-testid="stAppViewContainer"] {
+html, body {
     background-color: var(--bg-main);
     color: var(--text-main);
-    font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: "Inter", "Segoe UI", sans-serif;
 }
 
-/* Remove Streamlit top spacing */
+/* Main content area */
+section.main {
+    background-color: var(--bg-main) !important;
+}
+
+/* Remove default white wrappers */
 .block-container {
+    background-color: transparent !important;
     max-width: 1100px;
     margin: 40px auto;
-    padding: 40px;
-    background-color: var(--bg-card);
-    border-radius: 18px;
-    border: 1px solid var(--border-subtle);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    padding: 0;
 }
 
 /* ============================= */
@@ -51,11 +53,6 @@ html, body, [data-testid="stAppViewContainer"] {
     color: var(--text-muted) !important;
 }
 
-[data-testid="stSidebar"] .stSelectbox,
-[data-testid="stSidebar"] .stCheckbox {
-    background-color: transparent;
-}
-
 /* ============================= */
 /* HEADER */
 /* ============================= */
@@ -65,7 +62,19 @@ h1 {
     font-weight: 600;
     letter-spacing: 0.5px;
     color: var(--text-main);
-    margin-bottom: 50px;
+    margin: 40px 0 60px 0;
+}
+
+/* ============================= */
+/* CHAT AREA CARD */
+/* ============================= */
+
+[data-testid="stVerticalBlock"] > div {
+    background-color: var(--bg-card);
+    border-radius: 18px;
+    border: 1px solid var(--border-subtle);
+    padding: 40px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
 }
 
 /* ============================= */
@@ -78,12 +87,7 @@ h1 {
     margin-bottom: 16px;
     background-color: var(--bg-bubble);
     border: 1px solid var(--border-subtle);
-    transition: all 0.2s ease;
-}
-
-/* Assistant bubble */
-[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) {
-    background-color: var(--bg-bubble);
+    transition: 0.2s ease;
 }
 
 /* User bubble */
@@ -91,12 +95,6 @@ h1 {
     background-color: var(--bg-user);
     border: none;
     color: white;
-    box-shadow: 0 4px 20px rgba(30,64,175,0.4);
-}
-
-/* Hover subtle lift */
-[data-testid="stChatMessage"]:hover {
-    border: 1px solid var(--border-light);
 }
 
 /* ============================= */
@@ -109,47 +107,25 @@ textarea {
     border-radius: 12px !important;
     border: 1px solid var(--border-subtle) !important;
     padding: 14px !important;
-    font-size: 15px !important;
-    transition: all 0.2s ease;
 }
 
-/* Focus effect */
 textarea:focus {
     border: 1px solid var(--accent) !important;
     box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
 }
 
-/* Input container spacing */
-[data-testid="stChatInput"] {
-    margin-top: 30px;
-}
-
 /* ============================= */
-/* BUTTONS */
+/* BUTTON */
 /* ============================= */
 
 button[kind="primary"] {
     background-color: var(--accent);
     border-radius: 10px;
     border: none;
-    padding: 8px 18px;
-    font-weight: 500;
-    transition: all 0.2s ease;
 }
 
 button[kind="primary"]:hover {
     background-color: #2563eb;
-    box-shadow: 0 5px 18px rgba(59,130,246,0.3);
-}
-
-/* ============================= */
-/* SELECT / DROPDOWN */
-/* ============================= */
-
-div[data-baseweb="select"] {
-    background-color: #0f172a !important;
-    border-radius: 10px;
-    border: 1px solid var(--border-subtle) !important;
 }
 
 /* ============================= */
@@ -160,10 +136,6 @@ div[data-baseweb="select"] {
     width: 8px;
 }
 
-::-webkit-scrollbar-track {
-    background: #0b1220;
-}
-
 ::-webkit-scrollbar-thumb {
     background: #1f2937;
     border-radius: 10px;
@@ -171,51 +143,6 @@ div[data-baseweb="select"] {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #334155;
-}
-
-/* ============================= */
-/* REMOVE STREAMLIT HEADER */
-/* ============================= */
-
-header[data-testid="stHeader"] {
-    background: transparent;
-}
-
-/* ============================= */
-/* OPTIONAL: SUBTLE PAGE GLOW */
-/* ============================= */
-
-[data-testid="stAppViewContainer"]::before {
-    content: "";
-    position: fixed;
-    width: 800px;
-    height: 800px;
-    top: -200px;
-    right: -200px;
-    background: radial-gradient(circle, rgba(59,130,246,0.08), transparent 70%);
-    z-index: 0;
-    pointer-events: none;
-}
-
-/* FORCE REMOVE LIGHT WRAPPERS */
-
-section.main > div {
-    background-color: transparent !important;
-}
-
-[data-testid="stAppViewContainer"] > .main {
-    background-color: #0b1220 !important;
-}
-
-[data-testid="stVerticalBlock"] {
-    background-color: transparent !important;
-}
-
-/* REMOVE WHITE TITLE CONTAINER */
-
-div:has(> h1) {
-    background-color: transparent !important;
-    box-shadow: none !important;
 }
 
 </style>
