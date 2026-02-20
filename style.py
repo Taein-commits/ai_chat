@@ -58,13 +58,19 @@ section[data-testid="stSidebar"] > div {
 /* BOTTOM CHAT BAR (GRADIENT) */
 /* ============================= */
 
-[data-testid="stBottom"] {
+[data-testid="stBottom"],
+[data-testid="stBottom"] > div, 
+[data-testid="stChatInputContainer"]
+{
     background: linear-gradient(
-        90deg,
-        rgba(131,58,180,0.95),
-        rgba(52,213,224,0.95),
-        rgba(255,200,0,0.95)
+        -45deg,
+        #833ab4,
+        #34d5e0,
+        #ffc800,
+        #ff4ecd
     );
+    background-size: 400% 400%;
+    animation: gradientMove 15s ease infinite;
     backdrop-filter: blur(8px);
     border-top: 1px solid rgba(255,255,255,0.2);
 }
